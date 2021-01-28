@@ -72,8 +72,8 @@ export class TestSheetsComponent implements OnInit {
   }
 
   initClient() {
-    const scopes = 'profile';
-    const discoveryDocs = ['https://people.googleapis.com/$discovery/rest?version=v1'];
+    const scopes = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+    const discoveryDocs = ['https://sheets.googleapis.com/$discovery/rest?version=v4'];
     const clientId = '429513684607-3rf9o9rsaumiglf8dn1gglo1fqqg8bnb.apps.googleusercontent.com';
 
     gapi.client.init({
@@ -97,7 +97,7 @@ export class TestSheetsComponent implements OnInit {
     if (isSignedIn) {
       this.authorizeButton.style.display = 'none';
       this.signoutButton.style.display = 'block';
-      this.makeApiCall();
+      this.listMajors();
     } else {
       this.authorizeButton.style.display = 'block';
       this.signoutButton.style.display = 'none';
@@ -110,6 +110,34 @@ export class TestSheetsComponent implements OnInit {
 
   handleSignoutClick(event) {
     gapi.auth2.getAuthInstance().signOut();
+  }
+
+  appendPre(message) {
+    var pre = document.getElementById('content');
+    var textContent = document.createTextNode(message + '\n');
+    pre.appendChild(textContent);
+  }
+
+  listMajors() {
+    gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: '1-ggvvQzaQuI4eA7GKVADPG_37UY1iCseMg2rjZwyX2I',
+      range: 'A1:C3',
+    }).then((response) => {
+      console.log(response);
+      // var range = response.result;
+      // if (range.values.length > 0) {
+      //   this.appendPre('Name, Major:');
+      //   for (let i = 0; i < range.values.length; i++) {
+      //     var row = range.values[i];
+      //     Print columns A and E, which correspond to indices 0 and 4.
+          // this.appendPre(row[0] + ', ' + row[4]);
+        // }
+      // } else {
+      //   this.appendPre('No data found.');
+      // }
+    }, (response) => {
+      this.appendPre('Error: ' + response.result.error.message);
+    });
   }
 
   // Load the API and make an API call.  Display the results on the screen.
